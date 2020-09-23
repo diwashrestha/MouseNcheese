@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Mouse and Cheese
+        </title>
+        <link rel="stylesheet" href="game.css">
+    </head>
+
+    <body>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <script>
+            // variable
+
+            var canvas = document.getElementById("gameCanvas");
+            var ctx = canvas.getContext("2d");
+            var rightPressed = false;
+            var leftPressed =  false;
+            var upPressed = false;
+            var downPressed = false;
+            var mouseX = 100;
+            var mouseY = 400;
+            var cheeseX = 30;
+            var cheeseY = 100;
+
+
+
+            // Draw 
+            function draw(){
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                drawCheese();
+                drawMouse();
+
+                if(rightPressed)
+                {
+                    mouseX += 7;
+                }
+                else if(leftPressed)
+                {
+                    mouseX -= 7;
+                }
+                else if(upPressed)
+                {
+                    mouseY -= 7;
+                }
+                else if(downPressed)
+                {
+                    mouseY +=7;
+                }
+            }
+
+            // draw mouse
+            function drawMouse(){
+                var mouseImg = new Image();
+                mouseImg.src = 'image/mouse.png';
+                ctx.drawImage(mouseImg,mouseX,mouseY)
+
+            }
+
+            // draw chesse
+            function drawCheese(){
+                var cheeseImg = new Image();
+                cheeseImg.src = 'image/cheese.png';
+                ctx.drawImage(cheeseImg, 100, 5)
+            }
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler,false);
+
+        function keyDownHandler(e){
+            if(e.key == "Right" || e.key == "ArrowRight"){
+                rightPressed = true;
+            }
+            else if(e.key == "Left" || e.key == "ArrowLeft"){
+                leftPressed = true;
+            }
+            else if(e.key == "Up" || e.key == "ArrowUp"){
+                upPressed = true;
+            }
+            else if(e.key == "Down" || e.key == "ArrowDown"){
+                downPressed = true;
+            }
+        }
+
+        function keyUpHandler(e){
+            if(e.key == "Right" || e.key == "ArrowRight"){
+                rightPressed = false;
+            }
+            else if(e.key == "Left" || e.key == "ArrowLeft"){
+                leftPressed = false;
+            }
+            else if(e.key == "Up" || e.key == "ArrowUp"){
+                upPressed = false;
+            }
+            else if(e.key == "Down" || e.key == "ArrowDown"){
+                downPressed = false;
+            }
+        }
+
+        function collisionDetection(){
+            for(var c = 0; c < )
+        }
+            setInterval(draw, 10);
+        </script>
+    </body>
+</html>
