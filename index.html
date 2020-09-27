@@ -1,106 +1,232 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>
-            Mouse and Cheese
-        </title>
-        <link rel="stylesheet" href="game.css">
+        <title>Mouse and Cheese</title>
     </head>
-
     <body>
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <script>
-            // variable
+        <div id="score">0</div>
+        <div id="counter"></div>
+        <canvas id="gameboard" width="550" height="550"></canvas>
 
-            var canvas = document.getElementById("gameCanvas");
-            var ctx = canvas.getContext("2d");
-            var rightPressed = false;
-            var leftPressed =  false;
-            var upPressed = false;
-            var downPressed = false;
-            var mouseX = 100;
-            var mouseY = 400;
-            var cheeseX = 30;
-            var cheeseY = 100;
-
-
-
-            // Draw 
-            function draw(){
-                ctx.clearRect(0,0,canvas.width,canvas.height);
-                drawCheese();
-                drawMouse();
-
-                if(rightPressed)
-                {
-                    mouseX += 7;
-                }
-                else if(leftPressed)
-                {
-                    mouseX -= 7;
-                }
-                else if(upPressed)
-                {
-                    mouseY -= 7;
-                }
-                else if(downPressed)
-                {
-                    mouseY +=7;
-                }
+        <style>
+            #gameboard{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                margin-top: 2em;
             }
 
-            // draw mouse
-            function drawMouse(){
-                var mouseImg = new Image();
-                mouseImg.src = 'image/mouse.png';
-                ctx.drawImage(mouseImg,mouseX,mouseY)
-
+            #score{
+                text-align: left;
+                font-size: 100px;
+                width: 100px;
+                margin-right: 0px;
             }
 
-            // draw chesse
-            function drawCheese(){
-                var cheeseImg = new Image();
-                cheeseImg.src = 'image/cheese.png';
-                ctx.drawImage(cheeseImg, 100, 5)
+            #counter{
+                text-align: right;
+                font-size: 80px;
+                width: 100px;
             }
-
-        document.addEventListener("keydown", keyDownHandler, false);
-        document.addEventListener("keyup", keyUpHandler,false);
-
-        function keyDownHandler(e){
-            if(e.key == "Right" || e.key == "ArrowRight"){
-                rightPressed = true;
-            }
-            else if(e.key == "Left" || e.key == "ArrowLeft"){
-                leftPressed = true;
-            }
-            else if(e.key == "Up" || e.key == "ArrowUp"){
-                upPressed = true;
-            }
-            else if(e.key == "Down" || e.key == "ArrowDown"){
-                downPressed = true;
-            }
-        }
-
-        function keyUpHandler(e){
-            if(e.key == "Right" || e.key == "ArrowRight"){
-                rightPressed = false;
-            }
-            else if(e.key == "Left" || e.key == "ArrowLeft"){
-                leftPressed = false;
-            }
-            else if(e.key == "Up" || e.key == "ArrowUp"){
-                upPressed = false;
-            }
-            else if(e.key == "Down" || e.key == "ArrowDown"){
-                downPressed = false;
-            }
-        }
-
-        function collisionDetection(){
-            for(var c = 0; c < )
-        }
-            setInterval(draw, 10);
-        </script>
+        </style>
     </body>
+    <script>
+        const board_background = "green";
+        const mouse_col = "white";
+        const cheese_col = "yellow";
+
+        let mouse = {x:200,y:200}
+        let score = 0;
+
+        let cheese_x;
+        let cheese_y;
+        var game_ended = false;
+        // Get the canvas element
+        const gameboard = document.getElementById("gameboard");
+        // Return a two dimensional drawing context
+        const gameboard_ctx = gameboard.getContext("2d");
+
+        // Start game
+        countdown(2);
+        main();
+        gen_cheese();
+        document.addEventListener("keydown", change_direction);
+
+        // main function called repeatedly to keep the game running
+
+        function main(){
+            
+            if(game_ended == true)
+            {
+                alert("Game OVER");
+                location.reload();
+            }
+            changing_direction = false;
+            setTimeout(function onTick(){
+                clear_board();
+                drawCheese();
+                move_mouse();
+                drawMouse();
+                //Repeat
+                main();
+            },20)
+        }
+
+        // draw a board around the canvas
+        function clear_board(){
+            // Select the color to fill the drawing
+            gameboard_ctx.fillStyle = board_background;
+            
+            // Draw a "filled" rectangle to cover the entire canvas
+            gameboard_ctx.fillRect(0,0, gameboard.width,gameboard.height);
+        }
+
+        // Draw the mmouse on the canvas
+        function drawMouse(){
+            // Draw mouse box
+            // Set the color of the mouse 
+            /*gameboard_ctx.fillStyle = mouse_col;
+            gameboard_ctx.strokestyle = "black";
+            gameboard_ctx.fillRect(mouse.x,mouse.y,10,10);
+            // Draw a border around the mouse
+            gameboard_ctx.strokeRect(mouse.x,mouse.y,10,10);
+            */
+           var mouseImg = new Image();
+           mouseImg.src = 'image/mouse.png';
+           gameboard_ctx.drawImage(mouseImg,mouse.x,mouse.y);
+        }
+
+        function drawCheese(){
+            /*gameboard_ctx.fillStyle = 'yellow';
+            gameboard_ctx.strokestyle = 'gold';
+            gameboard_ctx.fillRect(cheese_x,cheese_y,10,10);
+            gameboard_ctx.strokeRect(cheese_x,cheese_y,10,10);
+*/
+            var cheeseImg = new Image();
+            cheeseImg.src = 'image/cheese.png';
+            gameboard_ctx.drawImage(cheeseImg,cheese_x,cheese_y);
+        }
+
+        function random_cheese(min,max){
+            return Math.round((Math.random() * (max-min) + min) / 10) * 10;
+        }
+
+        function gen_cheese(){
+            // Generate a random number the cheese x-coordinate
+            cheese_x = random_cheese(0, gameboard.width - 10);
+
+            // Fenerate a random number for the cheese y-coordinate
+            cheese_y = random_cheese(0, gameboard.height - 10);
+
+            // if the new cheese location is where the snake currently is generate a new cheese location
+                const has_eaten = mouse.x == cheese_x && mouse.y == cheese_y;
+                if(has_eaten) gen_cheese();
+            
+        }
+
+        // check if the timer is 0
+        function has_game_ended(){
+            if(seconds == 0 && mins == 0)
+            {
+                return true;
+            }
+            
+        }
+
+        // Countdown Timer
+        function countdown(minutes) {
+            var seconds = 60;
+            var mins = minutes
+        function tick() {
+        var counter = document.getElementById("counter");
+        var current_minutes = mins-1;
+        seconds--;
+        counter.innerHTML = current_minutes.toString() + ":" + (seconds < 10 ? "0" : "") + String(seconds);
+        if( seconds > 0 ) {
+            setTimeout(tick, 1000);
+        } else {
+            
+            if(mins > 1){
+                
+                countdown(mins-1);           
+                    
+            }
+        }
+        if(seconds == 0 && current_minutes == 0)
+    {
+        game_ended = true;
+    }
+    }
+    tick();
+
+}
+
+
+
+
+        // control the movement of the mouse
+        function change_direction(event){
+            const LEFT_KEY = 37;
+            const RIGHT_KEY = 39;
+            const UP_KEY = 38;
+            const DOWN_KEY = 40;
+
+            if(changing_direction) return;
+            changing_direction = true;
+
+            const keyPressed = event.keyCode;
+            const goingUp = mouse.x + 10;
+            
+            if(keyPressed === LEFT_KEY){
+                mouse.x -= 10;
+                if(mouse.x <0)
+                {
+                    mouse.x =0;
+                }
+            }
+
+            if(keyPressed === UP_KEY){
+                mouse.y -= 10;
+                if(mouse.y  < 0)
+                {
+                    mouse.y = 0;
+                }
+            }
+
+            if(keyPressed === RIGHT_KEY){
+                mouse.x +=10;
+                if(mouse.x+50>gameboard.width)
+                {
+                    mouse.x = gameboard.width - 50;
+                }
+            }
+
+            if(keyPressed === DOWN_KEY){
+                mouse.y += 10;
+                if(mouse.y+50 >gameboard.height)
+                {
+                    mouse.y = gameboard.height - 50;
+                }
+            }
+        }
+
+        function move_mouse(){
+            //check if the cheese is eaten
+
+            distance = Math.sqrt((cheese_x - mouse.x)*(cheese_x-mouse.x)+(cheese_y - mouse.y)*(cheese_y-mouse.y));
+            
+            if(distance <= 25){
+                // Increase score
+                score += 10;
+                // Display score on screen
+                document.getElementById('score').innerHTML = score;
+                // Generate new cheese location
+                gen_cheese();
+            }
+        }
+
+
+
+    </script>
 </html>
